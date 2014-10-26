@@ -11,47 +11,44 @@ import at.jku.cp.rau.search.predicates.Predicate;
 public class DLDFS<T extends Node<T>> implements Search<T> {
 
 	private int limit;
-    private List<T> path = new ArrayList<T>();
-    private Predicate<T> endPredicate;
-	
+
 	public DLDFS(int limit) {
 		this.limit = limit;
 	}
-	
+
 	@Override
 	public List<T> search(T start, Predicate<T> endPredicate) {
-        this.endPredicate = endPredicate;
-
-        path.add(start);
-
-        return (dfs() ? path : null);
+		List<T> path = new ArrayList<>();
+		path.add(start);
+		return recursiveSearch(path, endPredicate);
 	}
 
-    private boolean dfs() {
-        // Get the current node
-        T node = path.get(path.size() - 1);
+	private List<T> recursiveSearch(List<T> path, Predicate<T> endPredicate) {
+		// get the current node
+		T current = path.get(path.size() - 1);
+		if(endPredicate.isTrueFor(current)) {
+			// solution found
+			return path;
+		}
+		if(path.size() - 1 == limit) {
+			return null;
+		}
+		// search recursively in child paths
+		for(T t : current.adjacent()) {
+			if(! path.contains(t)) {
+				// t still unexplored along this path
+				path.add(t);
+				List<T> resultPath = recursiveSearch(path, endPredicate);
+				// if a solution is found stop the search
+				if(resultPath != null) {
+					return resultPath;
+				} else {
+					path.remove(t);
+				}
+			}
+		}
+		// no solution found in child paths, failure
+		return null;
+	}
 
-        if(endPredicate.isTrueFor(node)) {
-            return true;
-        }
-
-        if(path.size() - 1 == limit) {
-            return false;
-        }
-
-        for(T neighbour : node.adjacent()) {
-            if(!path.contains(neighbour)) {
-                path.add(neighbour);
-
-                // If a path was found stop the search
-                if(dfs()) {
-                    return true;
-                } else {
-                    path.remove(neighbour);
-                }
-            }
-        }
-
-        return false;
-    }
 }
