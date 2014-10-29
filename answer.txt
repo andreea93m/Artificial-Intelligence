@@ -1,0 +1,51 @@
+2 (C)
+
+None of the heuristics guarantees that Greedy Best-First Search will lead to an optimal solution. The algorithm itself is not optimal, therfore does not guarantee to lead to an optimal solution with any heuristic.
+
+An example board where both heuristics lead a suboptimal solution is Level0 from the test framework:
+
+#####
+#.p.#
+#...#
+#...#
+#...#
+#.m.#
+#####
+
+with costs
+
+#####
+#111#
+#121#
+#121#
+#121#
+#111#
+#####
+
+With both heuristics, the algorithm takes the direct path in the middle where each step has a cost of 2, although the paths on the sides are less costly.
+
+Similarly, the two heuristics do not guarantee obtaining an optimal solution from A* Search. Combined with an admissible heuristic, A* Search would lead to an optimal solution, but these heuristics are not admissible.
+
+An example board where a suboptimal solution is produced with both heuristics is the following:
+
+#######
+#.....#
+#..p..#
+#.....#
+#..m..#
+#.....#
+#######
+
+#######
+#00000#
+#01110#
+#01110#
+#01110#
+#00000#
+#######
+
+The algorithm takes the direct path via the center tile with both heuristics, since the estimated path costs are higher by moving away from the goal first. However, the real path costs are lowest on a path on the sides.
+
+2 (D)
+
+
