@@ -48,4 +48,5 @@ The algorithm takes the direct path via the center tile with both heuristics, si
 
 2 (D)
 
+No objective statement can be made concerning which heuristic is better. If the heuristics would be admissible, the Manhatten distance would be better according to the theorem taught in the lecture. This would be because the Manhatten distance dominates the Euclidan distance.
 
