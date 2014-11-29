@@ -1,52 +1,52 @@
-2 (C)
+First of all, we establish our knowledge base from the statements in the riddle. The used literals are
 
-None of the heuristics guarantees that Greedy Best-First Search will lead to an optimal solution. The algorithm itself is not optimal, therfore does not guarantee to lead to an optimal solution with any heuristic.
+* IsMagical
+* GoesSailingOnRainbows
+* CanPlantRainbowSeeds
+* IsMythical
+* IsImmortal
+* IsHorned
 
-An example board where both heuristics lead a suboptimal solution is Level0 from the test framework:
+Now we write our knowledge base with these literals.
 
-#####
-#.p.#
-#...#
-#...#
-#...#
-#.m.#
-#####
+If the unicorn is magical or goes sailing on rainbows, then it can plant rainbow seeds.
+IsMagical OR GoesSailingOnRainbows IMPLIES CanPlantRainbowSeeds
 
-with costs
+(1) NOT IsMagical OR CanPlantRainbowSeeds
+(2) NOT GoesSailingOnRainbows OR CanPlantRainbowSeeds
 
-#####
-#111#
-#121#
-#121#
-#121#
-#111#
-#####
+If the unicorn is mythical, then it is immortal and goes sailing on rainbows.
+IsMythical IMPLIES IsImmortal AND GoesSailingOnRainbows
 
-With both heuristics, the algorithm takes the direct path in the middle where each step has a cost of 2, although the paths on the sides are less costly.
+(3) NOT IsMythical OR IsImmortal
+(4) NOT IsMythical OR GoesSailingOnRainbows
 
-Similarly, the two heuristics do not guarantee obtaining an optimal solution from A* Search. Combined with an admissible heuristic, A* Search would lead to an optimal solution, but these heuristics are not admissible.
+If it is not mythical, then it is just a mortal mammal.
+NOT IsMythical IMPLIES NOT IsImmortal
 
-An example board where a suboptimal solution is produced with both heuristics is the following:
+(5) IsMythical OR NOT IsImmortal
 
-#######
-#.....#
-#..p..#
-#.....#
-#..m..#
-#.....#
-#######
+If the unicorn is either immortal or a mammal, then it is horned.
+IsImmortal EXCLUSIVE OR NOT IsImmortal IMPLIES IsHorned
 
-#######
-#00000#
-#01110#
-#01110#
-#01110#
-#00000#
-#######
+(6) IsHorned
 
-The algorithm takes the direct path via the center tile with both heuristics, since the estimated path costs are higher by moving away from the goal first. However, the real path costs are lowest on a path on the sides.
+The unicorn is magical if it is horned.
+IsHorned IMPLIES IsMagical
 
-2 (D)
+(7) NOT IsHorned OR IsMagical
 
-No objective statement can be made concerning which heuristic is better. If the heuristics would be admissible, the Manhatten distance would be better according to the theorem taught in the lecture. This would be because the Manhatten distance dominates the Euclidan distance.
+The queried statements are proven or shown not to be inferable using resolution.
+
+2 (A)
+
+This statement is not inferable. The only possibility to prove it is to eliminate NOT IsMythical in (4). Furthermore, to show IsMythical we need to eliminate NOT IsImmortal in (5). However, IsImmortal can only be proven by eliminating NOT IsMythical again in (3).
+
+2 (B)
+
+(6), (7) infers
+(8) IsMagical
+
+(1), (8) infers
+(9) CanPlantRainbowSeeds
 
