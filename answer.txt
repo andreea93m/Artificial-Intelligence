@@ -1,52 +1,21 @@
-First of all, we establish our knowledge base from the statements in the riddle. The used literals are
+1.2 (A)
 
-* IsMagical
-* GoesSailingOnRainbows
-* CanPlantRainbowSeeds
-* IsMythical
-* IsImmortal
-* IsHorned
+For our problem, there is exactly one goal, evaporating the cloud. For each path that reaches this goal, the calculated reward is
+γ^n * R
+where γ is the discount facter, n is the number of steps to reach the goal, and R is the immediate reward when achieving the goal. Since there is no other goal, the discount factor only influences the calculated reward value for each path, but the order of the values (i.e. which path is favorable) is indifferent to the discount factor.
 
-Now we write our knowledge base with these literals.
+1.2 (B)
 
-If the unicorn is magical or goes sailing on rainbows, then it can plant rainbow seeds.
-IsMagical OR GoesSailingOnRainbows IMPLIES CanPlantRainbowSeeds
+The discount factor gives an estimate for the reward loss if the reward is far away in the future. If the discount factor is sufficiently low (i.e. close to zero), a low reward in the near future appears favorable over a high reward in the far future.
 
-(1) NOT IsMagical OR CanPlantRainbowSeeds
-(2) NOT GoesSailingOnRainbows OR CanPlantRainbowSeeds
+An example can be constructed by adapting the cloud evaporator goal: More than one clouds may be present on the board, but the game ends immediately after evaporating any cloud on the board. The reward is proportional to the number of evaporated clouds. Hence, the reward is higher if the player manages to evaporate several clounds at once.
 
-If the unicorn is mythical, then it is immortal and goes sailing on rainbows.
-IsMythical IMPLIES IsImmortal AND GoesSailingOnRainbows
+Consider this board:
 
-(3) NOT IsMythical OR IsImmortal
-(4) NOT IsMythical OR GoesSailingOnRainbows
+############
+#p.........#
+#c#.....#cc#
+############
 
-If it is not mythical, then it is just a mortal mammal.
-NOT IsMythical IMPLIES NOT IsImmortal
-
-(5) IsMythical OR NOT IsImmortal
-
-If the unicorn is either immortal or a mammal, then it is horned.
-IsImmortal EXCLUSIVE OR NOT IsImmortal IMPLIES IsHorned
-
-(6) IsHorned
-
-The unicorn is magical if it is horned.
-IsHorned IMPLIES IsMagical
-
-(7) NOT IsHorned OR IsMagical
-
-The queried statements are proven or shown not to be inferable using resolution.
-
-2 (A)
-
-This statement is not inferable. The only possibility to prove it is to eliminate NOT IsMythical in (4). Furthermore, to show IsMythical we need to eliminate NOT IsImmortal in (5). However, IsImmortal can only be proven by eliminating NOT IsMythical again in (3).
-
-2 (B)
-
-(6), (7) infers
-(8) IsMagical
-
-(1), (8) infers
-(9) CanPlantRainbowSeeds
+The player has two options: evaporating the closer cloud on the left at once (low, near future reward), or evaporating the two clouds on the right after moving across the board (high, far future reward). The favored option depends on the discount factor.
 

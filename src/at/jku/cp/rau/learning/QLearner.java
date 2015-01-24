@@ -62,43 +62,45 @@ public class QLearner
 	 */
 	public void learnQFunction(IBoard board)
 	{
-		List<Move> moves;
-		Move move;
+		List<Move> possibleMoves;
+		Move selectedMove;
 		IBoard before, after;
 		Double currentReward;
 		double immediateReward, bestReward;
 		for (int e = 0; e < numEpisodes; e++) {
 			before = board.copy();
 			while (before.isRunning()) {
-				moves = before.getPossibleMoves();
-				move = moves.get(random.nextInt(moves.size()));
+				possibleMoves = before.getPossibleMoves();
+				// select a random move from the possible moves and execute it on a copy of the board
+				selectedMove = possibleMoves.get(random.nextInt(possibleMoves.size()));
 				after = before.copy();
-				after.executeMove(move);
+				after.executeMove(selectedMove);
 				if (after.isRunning()) {
 					// still running
 					immediateReward = 0.0;
+					// estimate the future reward from this position
+					bestReward = Double.NEGATIVE_INFINITY;
+					for (Move m : after.getPossibleMoves()) {
+						synchronized (qmatrix) {
+							currentReward = qmatrix.get(new Pair<>(after, m));
+						}
+						if (currentReward != null && currentReward.doubleValue() > bestReward) {
+							bestReward = currentReward.doubleValue();
+						}
+					}
 				} else {
 					if (after.getEndCondition().getWinner() == 0) {
-						// has evaporated cloud
+						// has successfully evaporated cloud
 						immediateReward = 1.0;
 					} else {
-						// has gone sailing
-						immediateReward = 0.0;
+						// has unfortunately gone sailing
+						immediateReward = -1.0;
 					}
+					// there will be no future reward when the game is over
+					bestReward = 0.0;
 				}
 				synchronized (qmatrix) {
-					if (after.isRunning()) {
-						bestReward = 0.0;
-						for (Move m : after.getPossibleMoves()) {
-							currentReward = qmatrix.get(new Pair<>(after, m));
-							if (currentReward != null && currentReward.doubleValue() > bestReward) {
-								bestReward = currentReward.doubleValue();
-							}
-						}
-					} else {
-						bestReward = 0.0;
-					}
-					qmatrix.put(new Pair<>(before, move), immediateReward + discountFactor * bestReward);
+					qmatrix.put(new Pair<>(before, selectedMove), immediateReward + discountFactor * bestReward);
 				}
 				before = after;
 			}
@@ -113,7 +115,7 @@ public class QLearner
 	 */
 	public Move getMove(IBoard board)
 	{
-		Move bestMove = Move.STAY;
+		Move bestMove = null;
 		double bestReward = Double.NEGATIVE_INFINITY;
 		Double currentReward;
 		for (Move m : board.getPossibleMoves()) {
